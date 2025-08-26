@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Never Gonna Give You Up</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            text-align: center;
+            color: white;
+        }
+        
+        video {
+            width: 75vw;
+            height: 75vh;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            object-fit: contain;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        
+        .close-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .close-btn:hover {
+            background: #cc0000;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+        }
+        
+        .footer a {
+            color: #ff6b6b;
+            text-decoration: none;
+            margin: 0 5px;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: #ff4444;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Never Gonna Give You Up 🎵</h1>
+        <div class="subtitle">You've been rickrolled! Random chance strikes again.</div>
+        <video controls autoplay>
+            <source src="roll.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <br>
+        <button class="close-btn" id="closeBtn">Close This Tab</button>
+    </div>
+    
+    <div class="footer">
+        Made with ❤️ by <a href="https://www.linkedin.com/in/garret-morberg-nguyen-83293236b" target="_blank">Garret M-N</a> | 
+        <a href="https://github.com/GXboy12345" target="_blank">GitHub</a>
+    </div>
+    
+    <script src="rickroll.js"></script>
+</body>
+</html>

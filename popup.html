@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rickroll Extension</title>
+    <style>
+        :root {
+            --bg-start: #0f172a;
+            --bg-end: #1e293b;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --card: rgba(255, 255, 255, 0.06);
+            --card-border: rgba(148, 163, 184, 0.2);
+            --accent: #8b5cf6;
+            --accent-2: #06b6d4;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+        [data-theme="light"] {
+            --bg-start: #f8fafc;
+            --bg-end: #e2e8f0;
+            --text: #0f172a;
+            --muted: #475569;
+            --card: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(15, 23, 42, 0.08);
+            --accent: #7c3aed;
+            --accent-2: #0ea5e9;
+            --success: #16a34a;
+            --danger: #dc2626;
+        }
+        body {
+            width: 340px;
+            padding: 18px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            color: var(--text);
+            margin: 0;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 800;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 16px;
+        }
+        .theme-toggle {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            border-radius: 999px;
+            background: var(--card);
+            box-shadow: inset 0 0 0 1px var(--card-border);
+            cursor: pointer;
+        }
+        .theme-toggle .knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #fff, #f1f5f9);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            transition: transform 0.25s ease;
+        }
+        [data-theme="light"] .theme-toggle .knob {
+            transform: translateX(24px);
+        }
+        .stats {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .stat {
+            background: rgba(0,0,0,0.05);
+            border: 1px dashed var(--card-border);
+            border-radius: 8px;
+            padding: 8px;
+        }
+        .stat .label {
+            font-size: 11px;
+            color: var(--muted);
+        }
+        .stat .value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .progress {
+            height: 8px;
+            background: rgba(148, 163, 184, 0.25);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress .bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            transition: width 0.3s ease;
+        }
+        .progress.indeterminate .bar {
+            width: 40%;
+            animation: slide 1.4s infinite ease-in-out;
+        }
+        @keyframes slide {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(50%); }
+            100% { transform: translateX(200%); }
+        }
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 12px;
+        }
+        .mode-tab {
+            text-align: center;
+            padding: 8px 6px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            user-select: none;
+        }
+        .mode-tab.active {
+            color: var(--text);
+            background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+            box-shadow: inset 0 0 0 1px var(--card-border);
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: var(--card);
+            border-radius: 999px;
+            box-shadow: inset 0 0 0 1px var(--card-border);
+            cursor: pointer;
+        }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 999px;
+            transition: transform 0.2s ease;
+        }
+        .toggle.active::after { transform: translateX(24px); }
+        .control {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+        .control .title {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .range {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: rgba(148, 163, 184, 0.25);
+            border-radius: 999px;
+            outline: none;
+        }
+        .range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .buttons { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .btn {
+            padding: 10px 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.18);
+        }
+        .btn.secondary { background: var(--card); color: var(--text); box-shadow: none; border: 1px solid var(--card-border); }
+        .info { font-size: 11px; opacity: 0.8; text-align: center; margin-top: 8px; }
+        .footer { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--card-border); text-align: center; font-size: 11px; opacity: 0.8; }
+        .footer a { color: var(--accent-2); text-decoration: none; margin: 0 3px; }
+        .footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="brand">
+            <div class="logo">🎵</div>
+            <h1>Rickroll Extension</h1>
+        </div>
+        <div class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
+            <div class="knob"></div>
+        </div>
+    </div>
+
+    <div class="stats">
+        <div class="stats-grid">
+            <div class="stat">
+                <div class="label">Total Tabs Opened</div>
+                <div class="value" id="tabCount">0</div>
+            </div>
+            <div class="stat">
+                <div class="label">Rickrolls Triggered</div>
+                <div class="value" id="rickrollCount">0</div>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom: 8px;">
+            <div class="label" id="statLabel">Rickroll Chance</div>
+            <div class="value" id="statValue">1/250</div>
+        </div>
+        <div class="progress" id="progress"><div class="bar"></div></div>
+    </div>
+
+    <div class="row">
+        <div class="label">Extension Enabled</div>
+        <div class="toggle" id="toggle" role="switch" aria-checked="false"></div>
+    </div>
+
+    <div class="mode-selector">
+        <div class="mode-tab active" data-mode="roll">🎲 Roll</div>
+        <div class="mode-tab" data-mode="interval">🔢 Interval</div>
+        <div class="mode-tab" data-mode="roulette">🎰 Roulette</div>
+    </div>
+
+    <div class="control" id="rollControls">
+        <div class="title">
+            <span>Rickroll Chance (1/X)</span>
+            <strong id="chanceLabel">1/250</strong>
+        </div>
+        <input class="range" type="range" min="1" max="1000" value="250" id="chanceRange" aria-label="Rickroll Chance"/>
+    </div>
+
+    <div class="control" id="intervalControls" style="display: none;">
+        <div class="title">
+            <span>Interval (every X tabs)</span>
+            <strong id="intervalLabel">50</strong>
+        </div>
+        <input class="range" type="range" min="1" max="1000" value="50" id="intervalRange" aria-label="Interval"/>
+    </div>
+
+    <div class="control" id="rouletteControls" style="display: none;">
+        <div class="title">
+            <span>Cylinder Capacity</span>
+            <strong id="rouletteLabel">50</strong>
+        </div>
+        <input class="range" type="range" min="1" max="1000" value="50" id="rouletteRange" aria-label="Roulette Capacity"/>
+    </div>
+
+    <div class="buttons">
+        <button class="btn secondary" id="resetBtn">Reset Tab Counter</button>
+    </div>
+
+    <div class="info">Random chance to rickroll on every new tab!</div>
+
+    <div class="footer">
+        Made with ❤️ by <a href="https://www.linkedin.com/in/garret-morberg-nguyen-83293236b" target="_blank">Garret M-N</a> | 
+        <a href="https://github.com/GXboy12345" target="_blank">GitHub</a>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
