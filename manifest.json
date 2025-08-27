@@ -5,7 +5,11 @@
   "description": "Every 5th opened tab becomes a rickroll",
   "permissions": [
     "tabs",
-    "storage"
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://raw.githubusercontent.com/*"
   ],
   "background": {
     "service_worker": "background.js"

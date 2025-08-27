@@ -14,6 +14,18 @@ const chanceLabel = document.getElementById('chanceLabel');
 const intervalLabel = document.getElementById('intervalLabel');
 const rouletteLabel = document.getElementById('rouletteLabel');
 const themeToggle = document.getElementById('themeToggle');
+const intervalProgressToggle = document.getElementById('intervalProgressToggle');
+const chanceManualToggle = document.getElementById('chanceManualToggle');
+const chanceManualRow = document.getElementById('chanceManualRow');
+const chanceNumber = document.getElementById('chanceNumber');
+const intervalManualToggle = document.getElementById('intervalManualToggle');
+const intervalManualRow = document.getElementById('intervalManualRow');
+const intervalNumber = document.getElementById('intervalNumber');
+const rouletteManualToggle = document.getElementById('rouletteManualToggle');
+const rouletteManualRow = document.getElementById('rouletteManualRow');
+const rouletteNumber = document.getElementById('rouletteNumber');
+const accent1Input = document.getElementById('accent1Input');
+const accent2Input = document.getElementById('accent2Input');
 
 // Mode selector elements
 const modeTabs = document.querySelectorAll('.mode-tab');
@@ -45,7 +57,7 @@ function loadState() {
 
 // Update UI with current state
 function updateUI(state) {
-    const { tabCount, isEnabled, randomChance, mode, intervalValue, rouletteProgress, rouletteTarget, rickrollCount } = state;
+    const { tabCount, isEnabled, randomChance, mode, intervalValue, rouletteProgress, rouletteTarget, rickrollCount, intervalProgressVisible, chanceManualEnabled, intervalManualEnabled, rouletteManualEnabled, accent1, accent2 } = state;
 
     if (tabCountElement) tabCountElement.textContent = tabCount;
     if (rickrollCountElement) rickrollCountElement.textContent = rickrollCount || 0;
@@ -81,10 +93,15 @@ function updateUI(state) {
         const nextRickroll = intervalValue > 0 ? Math.ceil((tabCount + 1) / intervalValue) * intervalValue : 0;
         if (statValueElement) statValueElement.textContent = nextRickroll;
         const progress = intervalValue > 0 ? ((tabCount % intervalValue) / intervalValue) * 100 : 0;
-        setProgressDeterminate(progress);
+        if (intervalProgressVisible !== false) {
+            progressContainer.style.display = 'block';
+            setProgressDeterminate(progress);
+        } else {
+            progressContainer.style.display = 'none';
+        }
     } else if (mode === 'roulette') {
-        if (statLabelElement) statLabelElement.textContent = 'Progress:';
-        if (statValueElement) statValueElement.textContent = '???';
+        if (statLabelElement) statLabelElement.textContent = 'Rounds in Cylinder:';
+        if (statValueElement) statValueElement.textContent = `${intervalValue}`;
         setProgressIndeterminate();
     }
 
@@ -95,6 +112,67 @@ function updateUI(state) {
     } else {
         toggleElement.classList.remove('active');
         toggleElement.setAttribute('aria-checked', 'false');
+    }
+
+    // Interval progress toggle UI
+    if (intervalProgressToggle) {
+        if (intervalProgressVisible !== false) {
+            intervalProgressToggle.classList.add('active');
+            intervalProgressToggle.setAttribute('aria-checked', 'true');
+        } else {
+            intervalProgressToggle.classList.remove('active');
+            intervalProgressToggle.setAttribute('aria-checked', 'false');
+        }
+    }
+
+    // Manual toggles visibility and state
+    if (chanceManualToggle && chanceManualRow && chanceNumber) {
+        if (chanceManualEnabled) {
+            chanceManualToggle.classList.add('active');
+            chanceManualToggle.setAttribute('aria-checked', 'true');
+            chanceManualRow.style.display = 'grid';
+            chanceNumber.value = randomChance;
+        } else {
+            chanceManualToggle.classList.remove('active');
+            chanceManualToggle.setAttribute('aria-checked', 'false');
+            chanceManualRow.style.display = 'none';
+        }
+    }
+
+    if (intervalManualToggle && intervalManualRow && intervalNumber) {
+        if (intervalManualEnabled) {
+            intervalManualToggle.classList.add('active');
+            intervalManualToggle.setAttribute('aria-checked', 'true');
+            intervalManualRow.style.display = 'grid';
+            intervalNumber.value = intervalValue;
+        } else {
+            intervalManualToggle.classList.remove('active');
+            intervalManualToggle.setAttribute('aria-checked', 'false');
+            intervalManualRow.style.display = 'none';
+        }
+    }
+
+    if (rouletteManualToggle && rouletteManualRow && rouletteNumber) {
+        if (rouletteManualEnabled) {
+            rouletteManualToggle.classList.add('active');
+            rouletteManualToggle.setAttribute('aria-checked', 'true');
+            rouletteManualRow.style.display = 'grid';
+            rouletteNumber.value = intervalValue;
+        } else {
+            rouletteManualToggle.classList.remove('active');
+            rouletteManualToggle.setAttribute('aria-checked', 'false');
+            rouletteManualRow.style.display = 'none';
+        }
+    }
+
+    // Apply accent colors if available
+    if (accent1) {
+        document.documentElement.style.setProperty('--accent', accent1);
+        if (accent1Input) accent1Input.value = accent1;
+    }
+    if (accent2) {
+        document.documentElement.style.setProperty('--accent-2', accent2);
+        if (accent2Input) accent2Input.value = accent2;
     }
 }
 
@@ -162,6 +240,26 @@ if (chanceRange) {
     });
 }
 
+// Manual chance input handlers
+if (chanceManualToggle && chanceManualRow && chanceNumber) {
+    chanceManualToggle.addEventListener('click', function() {
+        const next = !chanceManualToggle.classList.contains('active');
+        chrome.runtime.sendMessage({ action: 'setManualToggle', key: 'chanceManualEnabled', value: next }, (response) => {
+            if (response && response.success) loadState();
+        });
+    });
+    chanceNumber.addEventListener('change', function() {
+        const v = parseInt(chanceNumber.value);
+        if (Number.isInteger(v) && v >= 1 && v <= 1000) {
+            chrome.runtime.sendMessage({ action: 'updateChance', randomChance: v }, (response) => {
+                if (response && response.success) loadState();
+            });
+        } else {
+            loadState();
+        }
+    });
+}
+
 // Update interval value (Interval and Roulette modes)
 if (intervalRange) {
     intervalRange.addEventListener('input', function() {
@@ -179,6 +277,26 @@ if (intervalRange) {
                     loadState(); // Reload state to update UI
                 }
             });
+        }
+    });
+}
+
+// Manual interval input handlers
+if (intervalManualToggle && intervalManualRow && intervalNumber) {
+    intervalManualToggle.addEventListener('click', function() {
+        const next = !intervalManualToggle.classList.contains('active');
+        chrome.runtime.sendMessage({ action: 'setManualToggle', key: 'intervalManualEnabled', value: next }, (response) => {
+            if (response && response.success) loadState();
+        });
+    });
+    intervalNumber.addEventListener('change', function() {
+        const v = parseInt(intervalNumber.value);
+        if (Number.isInteger(v) && v >= 1 && v <= 1000) {
+            chrome.runtime.sendMessage({ action: 'updateInterval', intervalValue: v }, (response) => {
+                if (response && response.success) loadState();
+            });
+        } else {
+            loadState();
         }
     });
 }
@@ -204,6 +322,26 @@ if (rouletteRange) {
     });
 }
 
+// Manual roulette input handlers
+if (rouletteManualToggle && rouletteManualRow && rouletteNumber) {
+    rouletteManualToggle.addEventListener('click', function() {
+        const next = !rouletteManualToggle.classList.contains('active');
+        chrome.runtime.sendMessage({ action: 'setManualToggle', key: 'rouletteManualEnabled', value: next }, (response) => {
+            if (response && response.success) loadState();
+        });
+    });
+    rouletteNumber.addEventListener('change', function() {
+        const v = parseInt(rouletteNumber.value);
+        if (Number.isInteger(v) && v >= 1 && v <= 1000) {
+            chrome.runtime.sendMessage({ action: 'updateInterval', intervalValue: v }, (response) => {
+                if (response && response.success) loadState();
+            });
+        } else {
+            loadState();
+        }
+    });
+}
+
 // Reset tab counter
 if (resetBtn) {
     resetBtn.addEventListener('click', function() {
@@ -223,5 +361,45 @@ if (themeToggle) {
         const next = current === 'light' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', next);
         chrome.storage.local.set({ theme: next });
+    });
+}
+
+// Interval progress visibility toggle
+if (intervalProgressToggle) {
+    intervalProgressToggle.addEventListener('click', function() {
+        const isActive = intervalProgressToggle.classList.contains('active');
+        const next = !isActive;
+        chrome.runtime.sendMessage({
+            action: 'updateIntervalProgressVisible',
+            intervalProgressVisible: next
+        }, (response) => {
+            if (response && response.success) {
+                loadState();
+            }
+        });
+    });
+}
+
+// Color customization handlers
+if (accent1Input) {
+    accent1Input.addEventListener('input', function() {
+        const value = accent1Input.value;
+        document.documentElement.style.setProperty('--accent', value);
+    });
+    accent1Input.addEventListener('change', function() {
+        chrome.runtime.sendMessage({ action: 'setAccent', key: 'accent1', value: accent1Input.value }, (response) => {
+            if (response && response.success) loadState();
+        });
+    });
+}
+if (accent2Input) {
+    accent2Input.addEventListener('input', function() {
+        const value = accent2Input.value;
+        document.documentElement.style.setProperty('--accent-2', value);
+    });
+    accent2Input.addEventListener('change', function() {
+        chrome.runtime.sendMessage({ action: 'setAccent', key: 'accent2', value: accent2Input.value }, (response) => {
+            if (response && response.success) loadState();
+        });
     });
 }

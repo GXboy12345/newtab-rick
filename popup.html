@@ -290,6 +290,14 @@
             <strong id="chanceLabel">1/250</strong>
         </div>
         <input class="range" type="range" min="1" max="1000" value="250" id="chanceRange" aria-label="Rickroll Chance"/>
+        <div class="row">
+            <div class="label">Use manual input</div>
+            <div class="toggle" id="chanceManualToggle" role="switch" aria-checked="false"></div>
+        </div>
+        <div class="row" id="chanceManualRow" style="display: none;">
+            <div class="label">Manual value</div>
+            <input type="number" id="chanceNumber" min="1" step="1" value="250" style="width: 120px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card); color: var(--text);" />
+        </div>
     </div>
 
     <div class="control" id="intervalControls" style="display: none;">
@@ -298,6 +306,18 @@
             <strong id="intervalLabel">50</strong>
         </div>
         <input class="range" type="range" min="1" max="1000" value="50" id="intervalRange" aria-label="Interval"/>
+        <div class="row">
+            <div class="label">Use manual input</div>
+            <div class="toggle" id="intervalManualToggle" role="switch" aria-checked="false"></div>
+        </div>
+        <div class="row" id="intervalManualRow" style="display: none;">
+            <div class="label">Manual value</div>
+            <input type="number" id="intervalNumber" min="1" step="1" value="50" style="width: 120px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card); color: var(--text);" />
+        </div>
+        <div class="row">
+            <div class="label">Show progress bar</div>
+            <div class="toggle" id="intervalProgressToggle" role="switch" aria-checked="true"></div>
+        </div>
     </div>
 
     <div class="control" id="rouletteControls" style="display: none;">
@@ -306,6 +326,29 @@
             <strong id="rouletteLabel">50</strong>
         </div>
         <input class="range" type="range" min="1" max="1000" value="50" id="rouletteRange" aria-label="Roulette Capacity"/>
+        <div class="row">
+            <div class="label">Use manual input</div>
+            <div class="toggle" id="rouletteManualToggle" role="switch" aria-checked="false"></div>
+        </div>
+        <div class="row" id="rouletteManualRow" style="display: none;">
+            <div class="label">Manual value</div>
+            <input type="number" id="rouletteNumber" min="1" step="1" value="50" style="width: 120px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--card-border); background: var(--card); color: var(--text);" />
+        </div>
+    </div>
+
+    <div class="control" id="colorControls">
+        <div class="title">
+            <span>Color Customization</span>
+            <strong>Accent</strong>
+        </div>
+        <div class="row">
+            <div class="label">Accent 1</div>
+            <input type="color" id="accent1Input" value="#8b5cf6" style="width: 48px; height: 28px; border: none; background: transparent;" />
+        </div>
+        <div class="row">
+            <div class="label">Accent 2</div>
+            <input type="color" id="accent2Input" value="#06b6d4" style="width: 48px; height: 28px; border: none; background: transparent;" />
+        </div>
     </div>
 
     <div class="buttons">
